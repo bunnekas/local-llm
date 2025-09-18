@@ -9,7 +9,6 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_community.chat_models import ChatOllama
-from langchain_openai import ChatOpenAI
 
 from .config import get_settings
 from .vectorstore import get_vectorstore
@@ -27,6 +26,14 @@ def build_llm():
             raise ValueError(
                 "LOCAL_LLM_OPENAI_API_KEY must be set when llm_provider is 'openai'."
             )
+        try:
+            from langchain_openai import ChatOpenAI  # type: ignore
+        except ImportError as exc:  # pragma: no cover - import-time guard
+            raise ImportError(
+                "langchain-openai is required when llm_provider is 'openai'. "
+                "Install a version compatible with langchain 0.3.x, for example:\n"
+                "  pip install 'langchain-openai==0.3.19'"
+            ) from exc
         return ChatOpenAI(
             model=settings.openai_model,
             base_url=settings.openai_base_url,
@@ -40,7 +47,7 @@ def build_rag_chain():
 
     llm = build_llm()
     vs = get_vectorstore()
-    retriever = vs.as_retriever(search_kwargs={"k": 5})
+    retriever = vs.as_retriever(search_kwargs={"k": 10})
 
     prompt = ChatPromptTemplate.from_messages(
         [
@@ -49,8 +56,11 @@ def build_rag_chain():
                 (
                     "Du bist ein hilfreicher Assistent für Fragen zu Dissertationen, "
                     "die am FIR e.V. an der RWTH Aachen veröffentlicht wurden. "
-                    "Beantworte Fragen ausschließlich auf Basis des gegebenen Kontexts. "
-                    "Wenn du keine Antwort findest, sag explizit, dass du es nicht weißt."
+                    "Fasse, wenn möglich, das Thema der jeweiligen Dissertation in 2–3 "
+                    "Sätzen zusammen, auch wenn der Kontext den Titel oder die "
+                    "Fragestellung nur indirekt beschreibt. Nutze ausschließlich den "
+                    "gegebenen Kontext; wenn du wirklich nichts ableiten kannst, sag "
+                    "explizit, dass du es nicht weißt."
                 ),
             ),
             MessagesPlaceholder("chat_history"),

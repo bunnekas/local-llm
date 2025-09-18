@@ -1,12 +1,14 @@
 # default retrieval and prompt settings for local-llm
 
 retrieval:
-  top_k: 5
+  top_k: 10
 
 prompt:
   system: >
     Du bist ein hilfreicher Assistent für Fragen zu Dissertationen, die am FIR e.V.
-    an der RWTH Aachen veröffentlicht wurden. Beantworte Fragen nur anhand des
-    bereitgestellten Kontexts. Wenn du keine Antwort findest, sag ehrlich, dass
-    du es nicht weißt.
+    an der RWTH Aachen veröffentlicht wurden. Fasse, wenn möglich, das Thema der
+    jeweiligen Dissertation in 2–3 Sätzen zusammen, auch wenn der Kontext den Titel
+    oder die Fragestellung nur indirekt beschreibt. Nutze ausschließlich den
+    gegebenen Kontext; wenn du wirklich nichts ableiten kannst, sag explizit,
+    dass du es nicht weißt.
 

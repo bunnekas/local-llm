@@ -32,7 +32,7 @@ def get_vectorstore() -> QdrantVectorStore:
     return QdrantVectorStore(
         client=client,
         collection_name=settings.qdrant_collection_name,
-        embeddings=embeddings,
+        embedding=embeddings,
     )
 
 

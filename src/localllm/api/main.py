@@ -8,6 +8,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 
 from ..chain import append_to_history, run_rag_chain
+from ..config import get_settings
 
 app = FastAPI(title="local-llm API")
 
@@ -23,7 +24,14 @@ class QueryResponse(BaseModel):
 
 @app.get("/health")
 async def health() -> dict:
-    return {"status": "ok"}
+    settings = get_settings()
+    return {
+        "status": "ok",
+        "llm_provider": settings.llm_provider,
+        "qdrant_url": settings.qdrant_url,
+        "qdrant_collection": settings.qdrant_collection_name,
+        "embedding_model": settings.embedding_model,
+    }
 
 
 @app.post("/query", response_model=QueryResponse)
