@@ -23,6 +23,8 @@ and exposes both a Streamlit UI and a small FastAPI backend.
 Install (ideally in a virtualenv):
 
 ```bash
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -e .
 ```
 
@@ -86,6 +88,8 @@ against a small OpenAI model (or any OpenAI-compatible HTTP API).
 1. Install the package (ideally in a virtualenv):
 
 ```bash
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -e .
 ```
 
