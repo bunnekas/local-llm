@@ -21,8 +21,10 @@ def fetch_health() -> dict | None:
         return None
 
 
-def ask_api(question: str, chat_history: List[str]) -> str:
+def ask_api(question: str, chat_history: List[str], source: str | None) -> str:
     payload = {"question": question, "chat_history": chat_history}
+    if source:
+        payload["source"] = source
     resp = httpx.post(f"{API_URL}/query", json=payload, timeout=60)
     resp.raise_for_status()
     data = resp.json()
@@ -38,6 +40,17 @@ def main() -> None:
         st.markdown("### local-llm")
         st.caption("FIR / RWTH dissertation assistant")
         st.markdown("---")
+
+        sources = {
+            "Alle Dissertationen": "",
+            "Defer (2022)": "fir_defer_Datenbasierte_IH_2022[84].pdf",
+            "Goetzen (2022)": "GOETZEN_Ordnungsrahmen_2022_Dissertation.pdf",
+            "Leiting (2023)": "fir_Leiting_KonfigundPreisbildung_Diss_2023.pdf",
+            "Mueller (2023)": "fir_Mueller_Gestaltungsinstrumente_BA_Diss_2023.pdf",
+            "Spiss (2024)": "fir_Spiss_Systematische_Konfiguration_2024.pdf",
+        }
+        choice = st.selectbox("Dissertation filtern", list(sources.keys()))
+        selected_source = sources[choice]
         st.markdown("**Backend**")
         st.code(API_URL, language="text")
         if health:
@@ -67,7 +80,7 @@ def main() -> None:
         with st.chat_message("user"):
             st.write(question)
         try:
-            answer = ask_api(question, st.session_state.chat_history)
+            answer = ask_api(question, st.session_state.chat_history, selected_source or None)
         except Exception as e:  # noqa: BLE001
             answer = f"Fehler bei der Anfrage: {e}"
         st.session_state.chat_history.append(question)

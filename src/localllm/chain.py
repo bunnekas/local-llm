@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
@@ -76,13 +76,18 @@ def build_rag_chain():
 def run_rag_chain(
     question: str,
     chat_history: list[Any] | None = None,
+    source_filter: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Run the chain with a simple chat history structure."""
 
     chain = build_rag_chain()
     history = chat_history or []
     # history is expected to be a list of LangChain messages
-    return chain.invoke({"input": question, "chat_history": history})
+    payload: Dict[str, Any] = {"input": question, "chat_history": history}
+    if source_filter:
+        # QdrantVectorStore accepts a simple metadata filter dict
+        payload["filter"] = {"source": source_filter}
+    return chain.invoke(payload)
 
 
 def append_to_history(

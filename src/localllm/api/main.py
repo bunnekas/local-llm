@@ -16,6 +16,7 @@ app = FastAPI(title="local-llm API")
 class QueryRequest(BaseModel):
     question: str
     chat_history: Optional[List[str]] = None
+    source: Optional[str] = None
 
 
 class QueryResponse(BaseModel):
@@ -44,7 +45,7 @@ async def query(req: QueryRequest) -> QueryResponse:
         for msg in req.chat_history:
             history.append(HumanMessage(content=msg))
 
-    result = run_rag_chain(req.question, history)
+    result = run_rag_chain(req.question, history, source_filter=req.source)
     answer = result.get("answer") or result.get("output_text") or ""
     return QueryResponse(answer=answer)
 
