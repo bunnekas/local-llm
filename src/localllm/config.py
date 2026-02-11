@@ -33,10 +33,29 @@ class Settings(BaseSettings):
     chunk_size: int = Field(default=900, description="Number of characters per chunk")
     chunk_overlap: int = Field(default=150, description="Overlap between chunks")
 
-    # LLM / Ollama
-    llm_provider: str = Field(default="ollama", description="Only 'ollama' for now")
+    # LLM
+    llm_provider: str = Field(
+        default="ollama",
+        description="LLM provider to use: 'ollama' or 'openai'",
+    )
+
+    # Ollama
     ollama_model: str = Field(default="mistral")
     ollama_base_url: str = Field(default="http://localhost:11434")
+
+    # OpenAI or OpenAI-compatible HTTP API
+    openai_base_url: str = Field(
+        default="https://api.openai.com/v1",
+        description="Base URL for the OpenAI-compatible API",
+    )
+    openai_api_key: str | None = Field(
+        default=None,
+        description="API key for the OpenAI-compatible API",
+    )
+    openai_model: str = Field(
+        default="gpt-4o-mini",
+        description="Model name for the OpenAI-compatible API",
+    )
 
     class Config:
         env_prefix = "LOCAL_LLM_"

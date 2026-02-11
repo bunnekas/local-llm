@@ -9,17 +9,30 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_community.chat_models import ChatOllama
+from langchain_openai import ChatOpenAI
 
 from .config import get_settings
 from .vectorstore import get_vectorstore
 
 
-def build_llm() -> ChatOllama:
+def build_llm():
     settings = get_settings()
-    return ChatOllama(
-        model=settings.ollama_model,
-        base_url=settings.ollama_base_url,
-    )
+    if settings.llm_provider == "ollama":
+        return ChatOllama(
+            model=settings.ollama_model,
+            base_url=settings.ollama_base_url,
+        )
+    if settings.llm_provider == "openai":
+        if not settings.openai_api_key:
+            raise ValueError(
+                "LOCAL_LLM_OPENAI_API_KEY must be set when llm_provider is 'openai'."
+            )
+        return ChatOpenAI(
+            model=settings.openai_model,
+            base_url=settings.openai_base_url,
+            api_key=settings.openai_api_key,
+        )
+    raise ValueError(f"Unsupported llm_provider: {settings.llm_provider!r}")
 
 
 def build_rag_chain():
